@@ -197,6 +197,7 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     private bool _isMouseInFadingReversed = false;
     private double _touchInFadingDurationMs = 0;
     private bool _isCompatibleWindowTransparentEnabled = false;
+    private bool _isConnectionWarningVisible = true;
     private double _mainWindowSecondaryFontSize = 14;
     private double _mainWindowBodyFontSize = 16;
     private double _mainWindowEmphasizedFontSize = 18;
@@ -216,147 +217,11 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     private int _settingsPagesCachePolicy = 0;
     private string _notificationSpeechCustomSmgTokenSource = "";
 
-     #region GPTSoVITS
-
-    private string _gptSoVITSServerIP = "127.0.0.1";
-    private string _gptSoVITSPort = "8000";
-    private string _gptSoVITSVoiceName = "your_voice_name";
-    private string _gptSoVITSTextLang = "zh";
-    private string _gptSoVITSRefAudioPath = "archive_jingyuan_1.wav";
-    private string _gptSoVITSPromptLang = "zh";
-    private string _gptSoVITSPromptText = "我是「罗浮」云骑将军景元。不必拘谨，「将军」只是一时的身份，你称呼我景元便可";
-    private string _gptSoVITSTextSplitMethod = "cut5";
-    private int _gptSoVITSBatchSize = 1;
     private string _selectedUpdateMirrorV2 = "main";
     private string _selectedUpdateChannelV2 = "stable";
-
-    /// <summary>
-    /// GPTSoVITS 服务器的 IP 地址。
-    /// </summary>
-    public string GPTSoVITSServerIP
-    {
-        get => _gptSoVITSServerIP;
-        set
-        {
-            if (value == _gptSoVITSServerIP) return;
-            _gptSoVITSServerIP = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// GPTSoVITS 服务器的端口。
-    /// </summary>
-    public string GPTSoVITSPort
-    {
-        get => _gptSoVITSPort;
-        set
-        {
-            if (value == _gptSoVITSPort) return;
-            _gptSoVITSPort = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// GPTSoVITS 使用的语音名称。
-    /// </summary>
-    public string GPTSoVITSVoiceName
-    {
-        get => _gptSoVITSVoiceName;
-        set
-        {
-            if (value == _gptSoVITSVoiceName) return;
-            _gptSoVITSVoiceName = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// 文本语言。
-    /// </summary>
-    public string GPTSoVITSTextLang
-    {
-        get => _gptSoVITSTextLang;
-        set
-        {
-            if (value == _gptSoVITSTextLang) return;
-            _gptSoVITSTextLang = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// 参考音频的路径。
-    /// </summary>
-    public string GPTSoVITSRefAudioPath
-    {
-        get => _gptSoVITSRefAudioPath;
-        set
-        {
-            if (value == _gptSoVITSRefAudioPath) return;
-            _gptSoVITSRefAudioPath = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// 提示语言。
-    /// </summary>
-    public string GPTSoVITSPromptLang
-    {
-        get => _gptSoVITSPromptLang;
-        set
-        {
-            if (value == _gptSoVITSPromptLang) return;
-            _gptSoVITSPromptLang = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// 提示文本。
-    /// </summary>
-    public string GPTSoVITSPromptText
-    {
-        get => _gptSoVITSPromptText;
-        set
-        {
-            if (value == _gptSoVITSPromptText) return;
-            _gptSoVITSPromptText = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// 文本分割方法。
-    /// </summary>
-    public string GPTSoVITSTextSplitMethod
-    {
-        get => _gptSoVITSTextSplitMethod;
-        set
-        {
-            if (value == _gptSoVITSTextSplitMethod) return;
-            _gptSoVITSTextSplitMethod = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
-    /// 批量大小。
-    /// </summary>
-    public int GPTSoVITSBatchSize
-    {
-        get => _gptSoVITSBatchSize;
-        set
-        {
-            if (value == _gptSoVITSBatchSize) return;
-            _gptSoVITSBatchSize = value;
-            OnPropertyChanged();
-        }
-    }
-
-    #endregion
+    private GptSoVitsSpeechSettings _gptSoVitsSpeechSettings = new();
+    private double _mainWindowLineVerticalMargin = 5;
+    private ObservableCollection<string> _trustedProfileIds = [];
 
 
     public void NotifyPropertyChanged(string propertyName)
@@ -1196,6 +1061,17 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         }
     }
 
+    public double MainWindowLineVerticalMargin
+    {
+        get => _mainWindowLineVerticalMargin;
+        set
+        {
+            if (value.Equals(_mainWindowLineVerticalMargin)) return;
+            _mainWindowLineVerticalMargin = value;
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Components
@@ -1207,6 +1083,21 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         {
             if (value == _currentComponentConfig) return;
             _currentComponentConfig = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
+    #region Connection
+
+    public bool IsConnectionWarningVisible
+    {
+        get => _isConnectionWarningVisible;
+        set
+        {
+            if (value == _isConnectionWarningVisible) return;
+            _isConnectionWarningVisible = value;
             OnPropertyChanged();
         }
     }
@@ -1494,6 +1385,17 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         {
             if (value == _notificationSpeechCustomSmgTokenSource) return;
             _notificationSpeechCustomSmgTokenSource = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public GptSoVitsSpeechSettings GptSoVitsSpeechSettings
+    {
+        get => _gptSoVitsSpeechSettings;
+        set
+        {
+            if (Equals(value, _gptSoVitsSpeechSettings)) return;
+            _gptSoVitsSpeechSettings = value;
             OnPropertyChanged();
         }
     }
@@ -2310,6 +2212,17 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         {
             if (value == _settingsPagesCachePolicy) return;
             _settingsPagesCachePolicy = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ObservableCollection<string> TrustedProfileIds
+    {
+        get => _trustedProfileIds;
+        set
+        {
+            if (Equals(value, _trustedProfileIds)) return;
+            _trustedProfileIds = value;
             OnPropertyChanged();
         }
     }
