@@ -14,6 +14,8 @@
         xmlns:mdXaml="https://github.com/whistyun/MdXaml"
         xmlns:settingPages="clr-namespace:ClassIsland.Views.SettingPages"
         xmlns:action1="clr-namespace:ClassIsland.Shared.Models.Action;assembly=ClassIsland.Shared"
+        xmlns:services="clr-namespace:ClassIsland.Services"
+        xmlns:weather="clr-namespace:ClassIsland.Core.Models.Weather;assembly=ClassIsland.Core"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance local:FeatureDebugWindow}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -26,6 +28,22 @@
         Title="FeatureDebugWindow" Height="450" Width="800">
     <Grid>
         <TabControl HorizontalContentAlignment="Left">
+            <TabItem Header="WeatherIcon">
+                <Grid>
+                    <ListBox ItemsSource="{Binding WeatherService.WeatherStatusList}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:WeatherPackIconControl Code="{Binding Code}"
+                                                                     Width="24" Height="24"/>
+                                    <TextBlock Text="{Binding Weather}" VerticalAlignment="Center"/>
+
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </TabItem>
             <TabItem Header="ScheduleCalendar">
                 <Grid>
                     <controls:ScheduleCalendarControl/>
@@ -155,6 +173,11 @@
                                     Width="64" Height="64"
                                     StickerToolTip="帕姆_点赞"
                                     ImageSource="/Assets/HoYoStickers/帕姆_点赞.png"/>
+                    <controls:WeatherRangePackIconControl>
+                        <controls:WeatherRangePackIconControl.Value>
+                            <weather:RangedValue From="2" To="4"/>
+                        </controls:WeatherRangePackIconControl.Value>
+                    </controls:WeatherRangePackIconControl>
                 </StackPanel>
             </TabItem>
             <TabItem Header="LessonsListBox">
